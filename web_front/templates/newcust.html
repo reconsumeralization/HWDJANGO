@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Edit Customer</h2>
+    <h2>Add Customer</h2>
 
     <!-- Display any potential form errors -->
     {% if form.error %}
@@ -17,7 +17,7 @@
         </div>
     {% endif %}
 
-    <!-- Form for editing a customer -->
+    <!-- Form for adding a customer -->
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="container text-center my-auto p-5">
+      <div class="row">
+        <div class="col">
+          <a href="{% url 'new_cust' %}"><button type="submit" class="btn btn-primary">Add Customer</button></a>
+        </div>
+        <div class="col">
+          <h3>Customers</h3>
+        </div>
+        <div class="col">
+          <form method="get">
+            <input type="text" name="q" placeholder="Search customers...">
+            <input type="submit" value="Search">
+        </form>
+        </div>
+      </div>
+    </div>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Edit</th>
+          <th scope="col">Last Name</th>
+          <th scope="col">First Name</th>
+          <th scope="col">Phone Number</th>
+          <th scope="col">Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for customer in customers %}
+          <tr>
+            <td><a href="{% url 'edit_cust' customer.id %}"><button type="submit" class="btn btn-success">Edit</button></a></td>
+            <td>{{ customer.last_name }}</td>
+            <td>{{ customer.first_name }}</td>
+            <td>{{ customer.phone_number}}</td>
+            <td><a href="mailto: {{ customer.email }}">{{ customer.email }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-end">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1" tabindex="-1">First</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="?page=1" tabindex="-1">First</a>
+            </li>
+            {% endif %}
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="?page=1">Previous</a>
+            </li>
+            {% endif %}
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="?page={{ page_obj.number }}">Next</a>
+            </li>
+            {% endif %}
+            {% if not page_obj.has_next %}
+            <li class="page-item disabled">
+                <a class="page-link" href="?page={{ page_obj.number }}">Last</a>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ paginator.num_pages }}">Last</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

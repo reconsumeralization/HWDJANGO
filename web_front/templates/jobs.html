@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-<div class="container">
-  {% if messages %}
+<div class="container mt-4">
+    {% if messages %}
     {% for message in messages %}
       {% if message.tags == "success" %}
         <div class="alert alert-success alert-dismissible fade show" role="alert" >  
@@ -23,48 +24,66 @@
             </div>
         {% endif %}
     {% endfor %}
-  {% endif %}
+    {% endif %}
     <div class="container text-center my-auto p-5">
         <div class="row">
           <div class="col">
-            <a href="{% url 'new_prop' %}"><button type="submit" class="btn btn-primary">Add Property</button></a>
+            <a href="{% url 'new_job' %}"><button type="submit" class="btn btn-primary">New Job</button></a>
           </div>
           <div class="col">
-            <h3>Properties</h3>
+            <h3>Jobs List</h3>
           </div>
           <div class="col">
             <form method="get">
-              <input type="text" name="q" placeholder="Search properties...">
+              <input type="text" name="q" placeholder="Search jobs...">
               <input type="submit" value="Search">
           </form>
           </div>
         </div>
     </div>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Edit</th>
-          <th scope="col">Customer</th>
-          <th scope="col">Address</th>
-          <th scope="col">City</th>
-          <th scope="col">Zip</th>
-          <th scope="col">Sq Footage</th>
-          <th scope="memos">Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for property in properties %}
-          <tr>
-            <td><a href="{% url 'edit_prop' property.id %}"><button type="submit" class="btn btn-success">Edit</button></a></td>
-            <td>{{ property.customer }}</td>
-            <td>{{ property.address }}</td>
-            <td>{{ property.city }}</td>
-            <td>{{ property.zip_code }}</td>
-            <td>{{ property.seal_square_footage }}</td>
-            <td>{{ property.notes }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th>Edit</th>
+                <th>Address</th>
+                <th>Customer</th>
+                <th>Seal Date</th>
+                {% comment %} <th>Seal Quote</th>
+                <th>Patch Date</th>
+                <th>Patch Quote</th>
+                <th>Caulk Date</th> {% endcomment %}
+                <th>Quote</th>
+                {% comment %} <th>Notes</th>
+                <th>Job Done</th> {% endcomment %}
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in jobs %}
+            <tr>
+                <td>
+                    <a href="{% url 'edit_job' job.id %}" class="btn btn-sm btn-success">Edit</a>
+                </td>
+                <td>{{ job.property.address }}</td>
+                <td>{{ job.property.customer }}</td>
+                <td>{{ job.job_seal_date }}</td>
+                {% comment %} <td>${{ job.job_seal_quote }}</td>
+                <td>{{ job.job_patch_date }}</td>
+                <td>${{ job.job_patch_quote }}</td>
+                <td>{{ job.job_caulk_date }}</td> {% endcomment %}
+                <td>${{ job.job_total_quote }}</td>
+                {% comment %} <td>{{ job.job_notes }}</td>
+                <td>{{ job.job_done|yesno:"Done,Not Done" }}</td> {% endcomment %}
+                <td>
+                    <a href="{% url 'view_job' job.id %}" class="btn btn-sm btn-primary">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="11" class="text-center">No jobs found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 
     <nav aria-label="Page navigation">

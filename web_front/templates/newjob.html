@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Edit Customer</h2>
+    <h2>Add Job</h2>
 
     <!-- Display any potential form errors -->
     {% if form.error %}
@@ -17,11 +18,16 @@
         </div>
     {% endif %}
 
-    <!-- Form for editing a customer -->
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Save</button>
+        <label for="property">Select Property</label>
+        <select id="property" name="property">
+                {% for property in properties %}
+                    <option value="{{ property.id }}">{{ property.customer.last_name }}, {{ property.address }}</option>
+                {% endfor %}
+        </select>
+        {% crispy formset formset.form.helper %}
     </form>
 </div>
+
 {% endblock %}

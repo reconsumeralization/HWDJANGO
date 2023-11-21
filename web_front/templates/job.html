@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            Job Details
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">{{ job.property.address }} - {{ job.property.customer.last_name }}, {{ job.property.customer.first_name }}</h5>
+            <p class="card-text">Seal Date: {{ job.job_seal_date }}</p>
+            <p class="card-text">Seal Quote: ${{ job.job_seal_quote }}</p>
+            <p class="card-text">Patch Date: {{ job.job_patch_date }}</p>
+            <p class="card-text">Patch Square Footage: {{ job.job_patch_square_footage }}</p>
+            <p class="card-text">Patch Quote: ${{ job.job_patch_quote }}</p>
+            <p class="card-text">Caulk Date: {{ job.job_caulk_date }}</p>
+            <p class="card-text">Caulk Footage: {{ job.job_caulk_footage }}</p>
+            <p class="card-text">Total Quote: ${{ job.job_total_quote }}</p>
+            <p class="card-text">Notes: {{ job.job_notes }}</p>
+            <p class="card-text">Job Done: {{ job.job_done|yesno:"Yes,No" }}</p>
+            <a href="{% url 'edit_job' job.id %}" class="btn btn-primary">Edit</a>
+            <!-- Include more buttons or links as needed -->
+        </div>
+    </div>
+</div>
+{% endblock %}

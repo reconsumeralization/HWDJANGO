@@ -39,12 +39,14 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1',]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'https://crm.callrobertstanley.net']
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'https://crm.callrobertstanley.net']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'debug_toolbar',
     'web_front',
     'users_app',
     'crispy_forms',
@@ -59,6 +61,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -159,6 +162,45 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+CRISPY_FAIL_SILENTLY = not DEBUG
 
 LOGIN_REDIRECT_URL = 'index'
 LOGIN_URL = 'login'
+
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {  # logs to console
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
+        'file': {  # logs to file
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'loggers': {
+        'django': {  # logs to console and file
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'import_module': {  # logs to console and file
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'web_front': {  # logs to console and file
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
