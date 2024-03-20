@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Broken Contacts{% endblock %}
+{#{% block title %}Broken Contacts{% endblock %}#}
 
 {% block content %}
     <h2>Broken Contacts</h2>
@@ -8,6 +8,7 @@
         The following contacts are broken:
         <ul>
             {% for broken in broken_contacts %}
+{#                <li><a href="{% url 'edit_broken' %} {{ broken.last_name }} {{ broken.first_name }}</a></li>#}
                 <li>{{ broken.last_name }} {{ broken.first_name }}</li>
             {% endfor %}
         </ul>

@@ -21,6 +21,7 @@ urlpatterns = [
     path('view_job/<int:job_id>', views.ViewJob.as_view(), name='view_job'),
     path('import_customers', views.ImportCustomers.as_view(), name='import_customers'),
     path('broken_contacts', views.BrokenContacts.as_view(), name='broken_contacts'),
+    path('edit_broken/<int:broken_id>', views.EditBroken.as_view(), name='edit_broken'),
     # path('deleteprop/<property_id>', views.delete_prop.as_view(), name='delete_prop'),
     # path('newmemo', views.new_memo.as_view(), name='new_memo'),
     # path('editmemo/<memo_id>', views.edit_memo.as_view(), name='edit_memo'),

@@ -3,7 +3,15 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div, Submit, Row, Column, Field, Fieldset, ButtonHolder, Button, Hidden
 from django.forms import inlineformset_factory
-from web_front.models import CustomerModel, PropertyModel, MemoModel, JobModel, InvoiceModel, ConstantsModel
+from web_front.models import (
+    CustomerModel,
+    PropertyModel,
+    MemoModel,
+    JobModel,
+    InvoiceModel,
+    ConstantsModel,
+    RemediationNeededModel,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +29,18 @@ class ConstantsForm(forms.ModelForm):
         self.helper.form_method = 'post'
         self.helper.form_class = 'blueForms'
         self.helper.form_id = 'id-constantsForm'
+
+
+class BrokenContactForm(forms.ModelForm):
+    class Meta:
+        model = RemediationNeededModel
+        fields = (
+            'first_name',
+            'last_name',
+            'email',
+            'phone_number',
+            'alt_phone_number'
+        )
 
 
 class CustomerForm(forms.ModelForm):

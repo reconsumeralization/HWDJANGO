@@ -34,6 +34,7 @@ from web_front.forms import (
     JobForm, 
     ConstantsForm,
     ExcelUploadForm,
+    BrokenContactForm,
 )
 from django.forms import modelformset_factory
 from django.db.models import Q, Prefetch
@@ -479,7 +480,7 @@ class ImportCustomers(LoginRequiredMixin, FormView):
 # ------- broken contacts view ----------------
 class BrokenContacts(LoginRequiredMixin, ListView):
     model = RemediationNeededModel
-    paginate_by = 10
+    paginate_by = 100
     ordering = ['last_name']
     template_name = 'broken_contacts.html'
     context_object_name = 'broken_contacts'
@@ -496,3 +497,20 @@ class BrokenContacts(LoginRequiredMixin, ListView):
                 Q(phone_number__icontains=query)
             )
         return queryset
+
+
+class EditBroken(LoginRequiredMixin, UpdateView):
+    model = RemediationNeededModel
+    form_class = BrokenContactForm
+    template_name = 'editbroken.html'
+
+    def get_object(self, queryset=None):
+        broken_id = self.kwargs.get('broken_id')
+        return get_object_or_404(RemediationNeededModel, id=broken_id)
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Customer updated successfully')
+        return super().form_valid(form)
+
+    success_url = reverse_lazy('customers')
+
