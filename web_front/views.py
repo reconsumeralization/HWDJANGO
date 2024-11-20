@@ -3,12 +3,16 @@ from django.views.generic import (
     TemplateView, ListView, CreateView, UpdateView, DetailView
 )
 from django.urls import reverse_lazy
-from .models import Customer, Property, Job, Lead
+from .models import Customer, Property, Job, Lead, Contact
 from .forms import JobForm, LeadForm
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from .services.analytics import LeadAnalyticsService
+from django.core.mail import send_mail
+from django.conf import settings
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'web_front/dashboard.html'
@@ -141,3 +145,25 @@ class LeadDashboardView(LoginRequiredMixin, TemplateView):
         )
 
         return context
+
+@api_view(['POST'])
+def contact_form(request):
+    try:
+        contact = Contact.objects.create(
+            name=request.data.get('name'),
+            email=request.data.get('email'),
+            phone=request.data.get('phone'),
+            message=request.data.get('message')
+        )
+
+        # Send email notification
+        send_mail(
+            subject=f'New Contact Form Submission from {contact.name}',
+            message=f'Name: {contact.name}\nEmail: {contact.email}\nPhone: {contact.phone}\nMessage: {contact.message}',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[settings.EMAIL_HOST_USER],
+        )
+
+        return Response({'status': 'success'})
+    except Exception as e:
+        return Response({'status': 'error', 'message': str(e)}, status=400)

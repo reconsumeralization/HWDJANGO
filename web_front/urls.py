@@ -13,5 +13,6 @@ urlpatterns = [
     path('leads/<int:pk>/', views.LeadDetailView.as_view(), name='lead_detail'),
     path('leads/<int:pk>/edit/', views.LeadUpdateView.as_view(), name='edit_lead'),
     path('leads/dashboard/', views.LeadDashboardView.as_view(), name='lead_dashboard'),
+    path('api/contact', views.contact_form, name='contact_form'),
     # Add other URL patterns as needed
 ]
