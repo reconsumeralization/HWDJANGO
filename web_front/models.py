@@ -1,108 +1,167 @@
-from phonenumber_field.modelfields import PhoneNumberField
 from django.db import models
+from django.contrib.auth import get_user_model
+from phonenumber_field.modelfields import PhoneNumberField
+from decimal import Decimal
 
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="%(class)s_created"
+    )
+    updated_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="%(class)s_updated"
+    )
 
-# ------ a model for leads ----------------
-class LeadsModel(models.Model):
-    last_name = models.CharField(max_length=30, blank=False)
-    first_name = models.CharField(max_length=30, blank=False)
-    email = models.EmailField(null=True, max_length=254, blank=True)
-    phone_number = PhoneNumberField(null=True, blank=True, region='US')
+    class Meta:
+        abstract = True
+
+class Customer(BaseModel):
+    last_name = models.CharField(max_length=30)
+    first_name = models.CharField(max_length=30)
+    email = models.EmailField(null=True, blank=True, unique=True)
+    phone_number = PhoneNumberField(region='US')
     alt_phone_number = PhoneNumberField(null=True, blank=True, region='US')
-    created_by = models.CharField(max_length=30, blank=True)
-    updated_by = models.CharField(max_length=30, blank=True)
-    lead_source = models.CharField(max_length=30, blank=True)
-    subscribed = models.BooleanField(default=False)
+    notes = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['last_name', 'first_name']
+        indexes = [
+            models.Index(fields=['last_name', 'first_name']),
+            models.Index(fields=['email']),
+        ]
 
     def __str__(self):
-        return f'{self.last_name}, {self.first_name}'
+        return f"{self.last_name}, {self.first_name}"
 
-
-# ------ a model for customers ----------------
-class CustomerModel(models.Model):
-    last_name = models.CharField(max_length=30, blank=False)
-    first_name = models.CharField(max_length=30, blank=False)
-    email = models.EmailField(max_length=254, blank=True)
-    phone_number = PhoneNumberField(null=True, blank=True, region='US')
-    alt_phone_number = PhoneNumberField(null=True, blank=True, region='US')
-    created_by = models.CharField(max_length=30, blank=True)
-    updated_by = models.CharField(max_length=30, blank=True)
-    subscribed = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f'{self.last_name}, {self.first_name}'
-
-
-# ------ a model for leads which need to be remediated ----------------
-class RemediationNeededModel(models.Model):
-    last_name = models.CharField(null=True, max_length=30, blank=False)
-    first_name = models.CharField(null=True, max_length=30, blank=False)
-    email = models.EmailField(null=True, max_length=254, blank=True)
-    phone_number = models.CharField(null=True, blank=True)
-    alt_phone_number = models.CharField(null=True, blank=True)
-    created_by = models.CharField(max_length=30, blank=True)
-    updated_by = models.CharField(max_length=30, blank=True)
-
-    def __str__(self):
-        return f'{self.last_name}, {self.first_name}'
-
-
-
-class PropertyModel(models.Model):
-    customer = models.ForeignKey(CustomerModel, on_delete=models.CASCADE)
-    address = models.CharField(max_length=50)
-    city = models.CharField(max_length=30)
-    state = models.CharField(max_length=30)
+class Property(BaseModel):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='properties')
+    address = models.CharField(max_length=100)
+    city = models.CharField(max_length=50)
+    state = models.CharField(max_length=2)
     zip_code = models.CharField(max_length=10)
-    seal_square_footage = models.IntegerField(blank=False, null=False)
+    square_footage = models.PositiveIntegerField()
+    notes = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Properties"
+        ordering = ['customer__last_name', 'address']
+
+    def __str__(self):
+        return f"{self.address}, {self.city}, {self.state}"
+
+class Job(BaseModel):
+    STATUS_CHOICES = [
+        ('lead', 'Lead'),
+        ('estimate', 'Estimate'),
+        ('scheduled', 'Scheduled'),
+        ('in-progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    PAVEMENT_TYPE_CHOICES = [
+        ('driveway', 'Driveway'),
+        ('parking_lot', 'Parking Lot'),
+        ('private_road', 'Private Road'),
+    ]
+
+    title = models.CharField(max_length=100)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='jobs')
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='jobs')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='lead')
+    pavement_type = models.CharField(max_length=20, choices=PAVEMENT_TYPE_CHOICES)
+    estimated_value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    scheduled_date = models.DateField(null=True, blank=True)
+    completion_date = models.DateField(null=True, blank=True)
+    description = models.TextField(blank=True, null=True)
+    photos = models.ManyToManyField('media.Media', blank=True)
+    job_done = models.BooleanField(default=False)
+    job_seal_square_footage = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.title} - {self.get_pavement_type_display()}"
+
+class Invoice(BaseModel):
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='invoices')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    paid = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Invoice #{self.id} for {self.job.title}"
+
+class Constants(BaseModel):
+    minimum_seal_price = models.DecimalField(max_digits=10, decimal_places=2)
+    base_seal_square_footage = models.PositiveIntegerField()
+    seal_price = models.DecimalField(max_digits=10, decimal_places=2)
+    patch_price = models.DecimalField(max_digits=10, decimal_places=2)
+    caulk_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return "Constants"
+
+class Memo(BaseModel):
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='memos')
+    content = models.TextField()
+
+    def __str__(self):
+        return f"Memo for {self.property.address}"
+
+class Lead(BaseModel):
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    email = models.EmailField(unique=True)
+    phone_number = PhoneNumberField(region='US')
+    source = models.CharField(max_length=50, choices=[
+        ('website', 'Website'),
+        ('referral', 'Referral'),
+        ('advertisement', 'Advertisement'),
+        ('other', 'Other'),
+    ])
+    status = models.CharField(max_length=20, choices=[
+        ('new', 'New'),
+        ('contacted', 'Contacted'),
+        ('qualified', 'Qualified'),
+        ('converted', 'Converted'),
+        ('unqualified', 'Unqualified'),
+    ], default='new')
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f'{self.customer.last_name}: {self.address}'
+        return f"{self.first_name} {self.last_name}"
 
+    def convert_to_customer(self):
+        """Convert lead to customer"""
+        customer = Customer.objects.create(
+            first_name=self.first_name,
+            last_name=self.last_name,
+            email=self.email,
+            phone_number=self.phone_number,
+            notes=self.notes
+        )
+        self.status = 'converted'
+        self.save()
+        return customer
 
-class MemoModel(models.Model):
-    property = models.ForeignKey(PropertyModel, on_delete=models.CASCADE, related_name='memos')
-    memo_field = models.TextField(blank=True, null=True)
+    def mark_as_contacted(self):
+        """Mark lead as contacted"""
+        if self.status == 'new':
+            self.status = 'contacted'
+            self.save()
+            return True
+        return False
 
-    def __str__(self):
-        return f'{self.property.customer.last_name}: {self.property.address}'
-
-
-class JobModel(models.Model):
-    property = models.ForeignKey(PropertyModel, on_delete=models.CASCADE, related_name='jobs')
-    job_seal_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    job_seal_square_footage = models.IntegerField(blank=False, null=False, default=0)
-    job_seal_quote = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=False)
-    job_patch_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    job_patch_square_footage = models.IntegerField(blank=True, null=True)
-    job_patch_quote = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    job_caulk_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    job_caulk_footage = models.IntegerField(blank=True, null=True)
-    job_total_quote = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    job_notes = models.TextField(blank=True, null=True)
-    job_done = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f'{self.job_seal_date}: {self.property.customer.last_name}: {self.job_total_quote}'
-
-
-class InvoiceModel(models.Model):
-    job = models.ForeignKey(JobModel, on_delete=models.CASCADE, related_name='invoices')
-    invoice_date = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    invoice_total = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    invoice_notes = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f'{self.invoice_date}: {self.job.property.customer.last_name}: {self.invoice_total}'
-
-
-class ConstantsModel(models.Model):
-    minimum_seal_price = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    base_seal_square_footage = models.IntegerField(blank=True, null=True)
-    seal_price = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    patch_price = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    caulk_price = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-
-    def __str__(self):
-        return f'Constants'
+    @property
+    def full_name(self):
+        """Return full name of lead"""
+        return f"{self.first_name} {self.last_name}"

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Reporting - HW Road and Asphalt Construction</h3>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Total Jobs</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_jobs }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Completed Jobs</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ completed_jobs }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Total Estimated Value</div>
+                <div class="card-body">
+                    <h5 class="card-title">${{ total_estimated_value }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">Total Leads</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ leads_count }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-secondary mb-3">
+                <div class="card-header">Total Invoices</div>
+                <div class="card-body">
+                    <h5 class="card-title">${{ invoices_total }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-dark mb-3">
+                <div class="card-header">Invoices Paid</div>
+                <div class="card-body">
+                    <h5 class="card-title">${{ invoices_paid }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add more detailed reports or charts as needed -->
+</div>
+{% endblock %}

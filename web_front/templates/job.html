@@ -5,22 +5,21 @@
 <div class="container mt-4">
     <div class="card">
         <div class="card-header">
-            Job Details
+            Job Details - HW Road and Asphalt Construction
         </div>
         <div class="card-body">
-            <h5 class="card-title">{{ job.property.address }} - {{ job.property.customer.last_name }}, {{ job.property.customer.first_name }}</h5>
-            <p class="card-text">Seal Date: {{ job.job_seal_date }}</p>
-            <p class="card-text">Seal Quote: ${{ job.job_seal_quote }}</p>
-            <p class="card-text">Patch Date: {{ job.job_patch_date }}</p>
-            <p class="card-text">Patch Square Footage: {{ job.job_patch_square_footage }}</p>
-            <p class="card-text">Patch Quote: ${{ job.job_patch_quote }}</p>
-            <p class="card-text">Caulk Date: {{ job.job_caulk_date }}</p>
-            <p class="card-text">Caulk Footage: {{ job.job_caulk_footage }}</p>
-            <p class="card-text">Total Quote: ${{ job.job_total_quote }}</p>
-            <p class="card-text">Notes: {{ job.job_notes }}</p>
-            <p class="card-text">Job Done: {{ job.job_done|yesno:"Yes,No" }}</p>
-            <a href="{% url 'edit_job' job.id %}" class="btn btn-primary">Edit</a>
-            <!-- Include more buttons or links as needed -->
+            <h5 class="card-title">{{ job.title }} - {{ job.get_pavement_type_display }}</h5>
+            <p class="card-text"><strong>Customer:</strong> {{ job.customer.first_name }} {{ job.customer.last_name }}</p>
+            <p class="card-text"><strong>Property Address:</strong> {{ job.property.address }}, {{ job.property.city }}, {{ job.property.state }}</p>
+            <p class="card-text"><strong>Status:</strong> {{ job.get_status_display }}</p>
+            <p class="card-text"><strong>Estimated Value:</strong> ${{ job.estimated_value }}</p>
+            <p class="card-text"><strong>Scheduled Date:</strong> {{ job.scheduled_date }}</p>
+            <p class="card-text"><strong>Completion Date:</strong> {{ job.completion_date }}</p>
+            <p class="card-text"><strong>Description:</strong> {{ job.description }}</p>
+            <p class="card-text"><strong>Job Done:</strong> {{ job.job_done|yesno:"Yes,No" }}</p>
+            <p class="card-text"><strong>Seal Square Footage:</strong> {{ job.job_seal_square_footage }}</p>
+            <p class="card-text"><strong>Notes:</strong> {{ job.job_notes }}</p>
+            <a href="{% url 'edit_job' job.id %}" class="btn btn-primary">Edit Job</a>
         </div>
     </div>
 </div>

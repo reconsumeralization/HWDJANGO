@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load lead_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Monthly Statistics -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Monthly Overview</h5>
+                    <p>Total Leads: {{ monthly_stats.total_leads }}</p>
+                    <p>Conversion Rate: {{ monthly_stats.conversion_rate|floatformat:1 }}%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Source Distribution -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Lead Sources</h5>
+                    {% for source in monthly_stats.source_distribution %}
+                        <div class="d-flex justify-content-between">
+                            <span>{{ source.source|title }}</span>
+                            <span class="badge bg-primary">{{ source.count }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Leads -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Leads</h5>
+                    {% for lead in recent_leads %}
+                        <div class="lead-item mb-2">
+                            <strong>{{ lead.full_name }}</strong>
+                            <span class="badge bg-{{ lead.status|status_color }}">
+                                {{ lead.get_status_display }}
+                            </span>
+                            <small class="text-muted d-block">
+                                {% lead_age lead.created_at %}
+                            </small>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

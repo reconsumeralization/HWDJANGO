@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Job Assigned</title>
+</head>
+<body>
+    <h2>Dear {{ customer.first_name }} {{ customer.last_name }},</h2>
+    <p>You have been assigned a new job titled <strong>{{ job.title }}</strong>.</p>
+    <p><strong>Job Details:</strong></p>
+    <ul>
+        <li>Status: {{ job.get_status_display }}</li>
+        <li>Pavement Type: {{ job.get_pavement_type_display }}</li>
+        <li>Estimated Value: ${{ job.estimated_value }}</li>
+    </ul>
+    <p>Please log in to your dashboard to view more details.</p>
+    <p>Thank you!</p>
+</body>
+</html>

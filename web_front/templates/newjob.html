@@ -6,7 +6,7 @@
     <h2>Add Job</h2>
 
     <!-- Display any potential form errors -->
-    {% if form.error %}
+    {% if form.errors %}
         <div class="alert alert-danger" role="alert">
             <ul>
                 {% for field in form %}
@@ -14,20 +14,17 @@
                         <li>{{ error }}</li>
                     {% endfor %}
                 {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
             </ul>
         </div>
     {% endif %}
 
-    <form method="post">
+    <!-- Form for adding a job -->
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <label for="property">Select Property</label>
-        <select id="property" name="property">
-                {% for property in properties %}
-                    <option value="{{ property.id }}">{{ property.customer.last_name }}, {{ property.address }}</option>
-                {% endfor %}
-        </select>
-        {% crispy formset formset.form.helper %}
+        {{ form|crispy }}
     </form>
 </div>
-
 {% endblock %}

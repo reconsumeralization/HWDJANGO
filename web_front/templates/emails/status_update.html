@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Job Status Update</title>
+</head>
+<body>
+    <h2>Dear {{ customer.first_name }} {{ customer.last_name }},</h2>
+    <p>The status of your job titled <strong>{{ job.title }}</strong> has been updated to <strong>{{ job.get_status_display }}</strong>.</p>
+    <p><strong>Job Details:</strong></p>
+    <ul>
+        <li>Pavement Type: {{ job.get_pavement_type_display }}</li>
+        <li>Estimated Value: ${{ job.estimated_value }}</li>
+        <li>Scheduled Date: {{ job.scheduled_date }}</li>
+        <li>Completion Date: {{ job.completion_date }}</li>
+    </ul>
+    <p>If you have any questions, please feel free to contact us.</p>
+    <p>Thank you!</p>
+</body>
+</html>
